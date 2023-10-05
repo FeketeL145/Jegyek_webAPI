@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\20231005_dolgozat_jegyek_WebAPI.props" />
+</Project>

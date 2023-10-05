@@ -13,15 +13,42 @@ namespace _20231005_dolgozat_jegyek_WebAPI.Controllers
         private readonly List<JegyekDto> jegyek = new();
 
         [HttpGet]
-        public ActionResult<IEnumerable<JegyekDto>> Get() 
+        public ActionResult<IEnumerable<JegyekDto>> Get()
         {
             try
             {
                 connect.connection.Open();
                 string sqlcommand = "SELECT * FROM jegynaplo";
-                MySqlCommand cmd = new MySqlCommand(sqlcommand);
+                MySqlCommand cmd = new MySqlCommand(sqlcommand, connect.connection);
                 MySqlDataReader reader = cmd.ExecuteReader();
-                while (reader.Read()) 
+                while (reader.Read())
+                {
+                    var result = new JegyekDto(
+                        reader.GetGuid("id"),
+                        reader.GetInt32("jegy"),
+                        reader.GetString("leiras"),
+                        reader.GetDateTime("letrejottido")
+                        );
+                    jegyek.Add(result);
+                }
+                connect.connection.Close();
+                return StatusCode(200, jegyek);
+            }
+            catch (Exception ex1)
+            {
+                return BadRequest(ex1.Message);
+            }
+        }
+        [HttpGet("{id}")]
+        public ActionResult<IEnumerable<JegyekDto>> GetId(Guid id)
+        {
+            try
+            {
+                connect.connection.Open();
+                string sqlcommand = $"SELECT * FROM jegynaplo WHERE jegynaplo.id == '@id'";
+                MySqlCommand cmd = new MySqlCommand(sqlcommand, connect.connection);
+                MySqlDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
                 {
                     var result = new JegyekDto(
                         reader.GetGuid("id"),
