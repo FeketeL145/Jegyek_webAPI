@@ -66,5 +66,29 @@ namespace _20231005_dolgozat_jegyek_WebAPI.Controllers
                 return BadRequest(ex1.Message);
             }
         }
+        [HttpPost]
+        public ActionResult<IEnumerable<CreateJegyekDto>> Put(CreateJegyekDto createJegyek)
+        {
+            Guid id = Guid.NewGuid();
+            string time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            try
+            {
+                connect.connection.Open();
+                string sqlcommand = $"INSERT INTO `jegynaplo`(`id`, `jegy`, `leiras`, `letrejottido`) VALUES (@id,@jegy,@leiras,@letrejottido)";
+                MySqlCommand cmd = new MySqlCommand(sqlcommand, connect.connection);
+                cmd.Parameters.AddWithValue("id", id);
+                cmd.Parameters.AddWithValue("jegy", createJegyek.jegy);
+                cmd.Parameters.AddWithValue("leiras", createJegyek.leiras);
+                cmd.Parameters.AddWithValue("letrejottido", time);
+                cmd.ExecuteNonQuery();
+                connect.connection.Close();
+                return StatusCode(200, jegyek);
+            }
+            catch (Exception ex1)
+            {
+                return BadRequest(ex1.Message);
+            }
+        }
+        
     }
 }
