@@ -67,7 +67,7 @@ namespace _20231005_dolgozat_jegyek_WebAPI.Controllers
             }
         }
         [HttpPost]
-        public ActionResult<IEnumerable<CreateJegyekDto>> Put(CreateJegyekDto createJegyek)
+        public ActionResult<IEnumerable<CreateJegyekDto>> Post(CreateJegyekDto createJegyek)
         {
             Guid id = Guid.NewGuid();
             string time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
@@ -89,6 +89,45 @@ namespace _20231005_dolgozat_jegyek_WebAPI.Controllers
                 return BadRequest(ex1.Message);
             }
         }
-        
+        [HttpPut("{id}")]
+        public ActionResult<IEnumerable<UpdateJegyekDto>> Put(UpdateJegyekDto updateJegyek, Guid id)
+        {
+            string time = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+            try
+            {
+                connect.connection.Open();
+                string sqlcommand = $"UPDATE `jegynaplo` SET `jegy`=@jegy,`leiras`=@leiras,`letrejottido`=@letrejottido WHERE `id` =@id";
+                MySqlCommand cmd = new MySqlCommand(sqlcommand, connect.connection);
+                cmd.Parameters.AddWithValue("jegy", updateJegyek.jegy);
+                cmd.Parameters.AddWithValue("leiras", updateJegyek.leiras);
+                cmd.Parameters.AddWithValue("letrejottido", time);
+                cmd.Parameters.AddWithValue("id", id);
+                cmd.ExecuteNonQuery();
+                connect.connection.Close();
+                return StatusCode(200, jegyek);
+            }
+            catch (Exception ex1)
+            {
+                return BadRequest(ex1.Message);
+            }
+        }
+        [HttpDelete]
+        public ActionResult Delete(Guid id)
+        {
+            try
+            {
+                connect.connection.Open();
+                string sqlcommand = $"DELETE FROM jegynaplo WHERE id = @id";
+                MySqlCommand cmd = new MySqlCommand(sqlcommand, connect.connection);
+                cmd.Parameters.AddWithValue("id", id);
+                cmd.ExecuteNonQuery();
+                connect.connection.Close();
+                return StatusCode(200, "Successfully deleted record");
+            }
+            catch (Exception ex1)
+            {
+                return BadRequest(ex1.Message);
+            }
+        }
     }
 }
